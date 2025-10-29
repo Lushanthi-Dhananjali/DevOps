@@ -1,0 +1,43 @@
+backend
+
+build:
+docker build -t fashion-backend .
+
+run:
+docker run -p 4000:4000 fashion-backend
+
+frontend
+
+build:
+docker build -t fashion .
+
+run:
+docker run -p 3000:3000 fashion
+
+compose
+
+build:
+docker compose up --build -d
+
+build:
+docker compose build
+docker compose up -d
+
+run:
+docker ps
+
+admin
+
+build:
+docker build -t admin-dev .
+
+run:
+docker run --name admin --rm -p 5173:5173 admin-dev
+
+
+only want logs:
+docker compose logs backend -f
+docker compose logs frontend -f
+
+dockeries whole project:
+docker-compose up --build

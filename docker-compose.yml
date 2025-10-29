@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    container_name: fashion-backend
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_URI=mongodb+srv://lushanthidananjali5_db_user:Lushanthi@cluster0.9i3etiq.mongodb.net/fashion
+      - JWT_SECRET=secret_ecom_some_random_strong_secret
+
+  admin:                        
+    build: ./admin
+    ports:
+      - "5173:5173"             
+    env_file:
+      - ./admin/.env
+    depends_on:
+      - backend    
