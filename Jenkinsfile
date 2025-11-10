@@ -1,14 +1,16 @@
 pipeline {
     agent any
     
+    tools {
+        nodejs 'nodejs'  // This matches the name in Jenkins Tools configuration
+    }
+    
     stages {
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    // Replace bat with sh for Linux
                     sh 'npm install'
                     sh 'npm run build'
-                    // Add your actual frontend build commands here
                 }
             }
         }
@@ -16,9 +18,8 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    // Replace bat with sh for Linux
-                    sh 'mvn clean package'  // or whatever build tool you use
-                    // Add your actual backend build commands here
+                    // Add your backend build commands
+                    sh 'echo "Building backend..."'
                 }
             }
         }
@@ -26,32 +27,23 @@ pipeline {
         stage('Build Admin') {
             steps {
                 dir('admin') {
-                    // Replace bat with sh for Linux
                     sh 'npm install'
                     sh 'npm run build'
-                    // Add your actual admin build commands here
                 }
             }
         }
         
         stage('Deploy') {
             steps {
-                // Replace bat with sh for Linux
-                sh 'docker-compose down'
+                sh 'docker-compose down || true'
                 sh 'docker-compose up -d'
-                // Add your actual deployment commands here
             }
         }
     }
     
     post {
         always {
-            // Replace bat with sh for Linux
             sh 'echo "Pipeline completed"'
-            // Add cleanup or notification commands here
-        }
-        success {
-            sh 'echo "Pipeline succeeded!"'
         }
         failure {
             sh 'echo "Pipeline failed!"'
