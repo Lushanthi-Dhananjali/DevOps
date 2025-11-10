@@ -5,7 +5,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    sh 'docker build -t fashion .'
+                    bat 'docker build -t fashion .'
                 }
             }
         }
@@ -13,7 +13,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    sh 'docker build -t fashion-backend .'
+                    bat 'docker build -t fashion-backend .'
                 }
             }
         }
@@ -21,21 +21,21 @@ pipeline {
         stage('Build Admin') {
             steps {
                 dir('admin') {
-                    sh 'docker build -t admin-dev .'
+                    bat 'docker build -t admin-dev .'
                 }
             }
         }
         
         stage('Deploy') {
             steps {
-                sh 'docker-compose up -d'
+                bat 'docker-compose up -d'
             }
         }
     }
     
     post {
         always {
-            sh 'docker-compose logs'
+            bat 'docker-compose logs'
         }
     }
 }
