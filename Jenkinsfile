@@ -1,16 +1,17 @@
 pipeline {
     agent any
     
-    tools {
-        nodejs 'nodejs'
-    }
-    
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    sh 'npm install'
-                    sh 'npm run build'
+                    bat 'docker build -t fashion .'
                 }
             }
         }
@@ -18,13 +19,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    // Add actual backend build commands when ready
-                    sh 'echo "Backend build would happen here"'
-                    // Example for Java:
-                    // sh 'mvn clean package'
-                    // Example for Node.js backend:
-                    // sh 'npm install'
-                    // sh 'npm run build'
+                    bat 'docker build -t fashion-backend .'
                 }
             }
         }
@@ -32,29 +27,23 @@ pipeline {
         stage('Build Admin') {
             steps {
                 dir('admin') {
-                    sh 'npm install'
-                    sh 'npm run build'
+                    bat 'docker build -t admin-dev .'
                 }
             }
         }
         
-        stage('Deploy') {
+        stage('Deploy with Docker Compose') {
             steps {
-                script {
-                    // Check if docker-compose exists
-                    def dockerComposeExists = sh(
-                        script: 'which docker-compose || echo "not-found"',
-                        returnStdout: true
-                    ).trim()
-                    
-                    if (dockerComposeExists != "not-found") {
-                        sh 'docker-compose down || true'
-                        sh 'docker-compose up -d'
-                        echo "Deployment completed successfully"
-                    } else {
-                        echo "WARNING: docker-compose not installed. Skipping deployment."
-                        echo "Please install Docker and Docker Compose on the Jenkins server."
-                    }
+                bat 'docker-compose up -d'
+            }
+        }
+        
+        stage('Deploy with Ansible') {
+            steps {
+                dir('ansible') {
+                    sh '''
+                    ansible-playbook playbooks/docker-deploy.yml -v
+                    '''
                 }
             }
         }
@@ -62,13 +51,13 @@ pipeline {
     
     post {
         always {
-            sh 'echo "Pipeline completed"'
+            bat 'docker-compose logs'
         }
         success {
-            sh 'echo "Pipeline succeeded!"'
+            echo 'Pipeline succeeded! All services deployed.'
         }
         failure {
-            sh 'echo "Pipeline failed!"'
+            echo 'Pipeline failed! Check logs above.'
         }
     }
 }
