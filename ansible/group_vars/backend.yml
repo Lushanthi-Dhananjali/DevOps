@@ -1,0 +1,5 @@
+---
+backend_path: /opt/backend
+backend_port: 5000
+node_env: production
+deploy_user: appuser

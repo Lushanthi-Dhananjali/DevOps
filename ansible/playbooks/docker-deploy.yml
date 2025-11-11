@@ -1,0 +1,25 @@
+---
+- name: Deploy Fashion App with Docker
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Check docker is installed
+      shell: docker --version
+      register: docker_version
+    
+    - name: Display docker version
+      debug:
+        msg: "{{ docker_version.stdout }}"
+    
+    - name: Build and deploy with docker-compose
+      shell: docker-compose up -d
+      args:
+        chdir: /mnt/d/DevOps\ Fashion/DevOps
+    
+    - name: Check running containers
+      shell: docker ps
+      register: docker_ps
+    
+    - name: Display running containers
+      debug:
+        msg: "{{ docker_ps.stdout }}"

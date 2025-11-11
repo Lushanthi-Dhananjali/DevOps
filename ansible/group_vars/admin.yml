@@ -1,0 +1,5 @@
+---
+admin_path: /var/www/admin
+admin_port: 4000
+node_env: production
+deploy_user: www-data

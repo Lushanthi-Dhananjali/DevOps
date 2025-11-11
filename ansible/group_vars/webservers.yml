@@ -1,0 +1,5 @@
+---
+nginx_enabled: true
+nginx_port: 80
+frontend_path: /var/www/html
+deploy_user: www-data
