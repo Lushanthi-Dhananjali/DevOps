@@ -1,85 +1,54 @@
 pipeline {
     agent any
-
     stages {
-
-        /* ------------ CHECKOUT CODE (SHALLOW CLONE) ------------ */
-        stage('Checkout') {
-            steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],               // Your branch
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/Lushanthi-Dhananjali/DevOps.git',
-                        credentialsId: 'github-devops'           // Your Jenkins GitHub credential
-                    ]],
-                    extensions: [
-                        [$class: 'CloneOption',                   // FIX GIT TIMEOUT
-                         shallow: true,
-                         noTags: false,
-                         depth: 1]
-                    ]
-                ])
-            }
+        stage('Checkout') { 
+            steps { 
+                checkout scm 
+            } 
         }
-
-        /* ------------ BUILD FRONTEND ------------ */
         stage('Build Frontend') {
-            steps {
-                dir('frontend') {
+            steps { 
+                dir('frontend') { 
                     sh '''
-                        docker build -t fashion-frontend . || \
-                        DOCKER_BUILDKIT=0 docker build -t fashion-frontend .
+                        # Build with fallback to legacy builder
+                        docker build -t fashion . || \
+                        DOCKER_BUILDKIT=0 docker build -t fashion .
                     '''
-                }
+                } 
             }
         }
-
-        /* ------------ BUILD BACKEND ------------ */
         stage('Build Backend') {
-            steps {
-                dir('backend') {
+            steps { 
+                dir('backend') { 
                     sh '''
                         docker build -t fashion-backend . || \
                         DOCKER_BUILDKIT=0 docker build -t fashion-backend .
                     '''
-                }
+                } 
             }
         }
-
-        /* ------------ BUILD ADMIN ------------ */
         stage('Build Admin') {
-            steps {
-                dir('admin') {
+            steps { 
+                dir('admin') { 
                     sh '''
-                        docker build -t fashion-admin . || \
-                        DOCKER_BUILDKIT=0 docker build -t fashion-admin .
+                        docker build -t admin-dev . || \
+                        DOCKER_BUILDKIT=0 docker build -t admin-dev .
                     '''
-                }
+                } 
             }
         }
-
-        /* ------------ DEPLOY WITH DOCKER COMPOSE ------------ */
-        stage('Deploy') {
-            steps {
-                sh '''
-                    docker-compose down || true
-                    docker-compose up -d
-                '''
+        stage('Deploy with Docker Compose') {
+            steps { 
+                sh 'docker-compose up -d || true'
             }
         }
     }
-
-    /* ------------ POST ACTIONS ------------ */
     post {
-        always {
-            echo "Showing running containers..."
+        always { 
             sh 'docker ps -a'
             sh 'docker-compose ps || true'
         }
-
         cleanup {
-            echo "Cleaning Docker unused data..."
             sh 'docker system prune -f'
         }
     }
